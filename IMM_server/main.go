@@ -2,9 +2,9 @@ package main
 
 import (
 	"IMM_server/core"
-	models2 "IMM_server/imm_chat/models"
-	models3 "IMM_server/imm_group/models"
-	"IMM_server/imm_user/models"
+	"IMM_server/imm_chat/chat_models"
+	"IMM_server/imm_group/group_models"
+	"IMM_server/imm_user/user_models"
 	"flag"
 	"fmt"
 )
@@ -22,16 +22,16 @@ func main() {
 	if opt.DB {
 		db := core.InitMysql()
 		err := db.AutoMigrate(
-			&models.UserModel{},
-			&models.FriendModel{},
-			&models.FriendVerifyModel{},
-			&models.UserConfModel{},
+			&user_models.UserModel{},         // 用户表
+			&user_models.FriendModel{},       // 好友表
+			&user_models.FriendVerifyModel{}, // 好友验证表
+			&user_models.UserConfModel{},     // 用户配置表
+			&chat_models.ChatModel{},         // 对话表
+			&group_models.GroupModel{},       // 群组表
+			&group_models.GroupMemberModel{}, // 群成员表
+			&group_models.GroupMsgModel{},    // 群消息表
+			&group_models.GroupVerifyModel{}, // 群验证表
 
-			&models2.ChatModel{},
-			&models3.GroupModel{},
-			&models3.GroupMemberModel{},
-			&models3.GroupMsgModel{},
-			&models3.GroupVerifyModel{},
 		)
 		if err != nil {
 			fmt.Println("表结构生成失败", err)

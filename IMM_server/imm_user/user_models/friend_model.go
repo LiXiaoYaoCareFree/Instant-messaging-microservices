@@ -1,4 +1,4 @@
-package models
+package user_models
 
 import "IMM_server/common/models"
 

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 )
 
+// VerificationQuestion 验证问题
 type VerificationQuestion struct {
 	Problem1 *string `json:"problem1"`
 	Problem2 *string `json:"problem2"`
