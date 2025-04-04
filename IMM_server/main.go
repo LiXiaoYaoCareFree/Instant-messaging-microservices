@@ -20,7 +20,7 @@ func main() {
 	flag.Parse()
 
 	if opt.DB {
-		db := core.InitMysql()
+		db := core.InitGorm("")
 		err := db.AutoMigrate(
 			&user_models.UserModel{},         // 用户表
 			&user_models.FriendModel{},       // 好友表
