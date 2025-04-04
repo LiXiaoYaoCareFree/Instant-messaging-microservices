@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"IMM_server/imm_auth/auth_api/internal/svc"
-	"IMM_server/imm_auth/auth_api/internal/types"
-
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -23,7 +21,7 @@ func NewLogoutLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LogoutLogi
 	}
 }
 
-func (l *LogoutLogic) Logout() (resp *types.Response, err error) {
+func (l *LogoutLogic) Logout() (resp string, err error) {
 	// todo: add your logic here and delete this line
 
 	return

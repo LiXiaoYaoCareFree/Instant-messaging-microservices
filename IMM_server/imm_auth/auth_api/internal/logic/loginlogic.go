@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"errors"
 
 	"IMM_server/imm_auth/auth_api/internal/svc"
 	"IMM_server/imm_auth/auth_api/internal/types"
@@ -24,12 +25,7 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, err error) {
+	// todo: add your logic here and delete this line
 
-	return &types.LoginResponse{
-		Code: 0,
-		Msg:  "登陆成功",
-		Data: types.LoginInfo{
-			Token: "xxx",
-		},
-	}, nil
+	return &types.LoginResponse{Token: "xxx"}, errors.New("登录失败")
 }
