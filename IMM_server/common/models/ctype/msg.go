@@ -1,10 +1,10 @@
 package ctype
 
-import "time"
-
-type SystemMsg struct {
-	Type int8 `json:"type"` // 违规类型  1 涉黄 2 涉恐  3 涉政  4 不正当言论
-}
+import (
+	"database/sql/driver"
+	"encoding/json"
+	"time"
+)
 
 type Msg struct {
 	Type         int8          `json:"type"`         // 消息类型 和msgType一模一样
@@ -19,6 +19,17 @@ type Msg struct {
 	ReplyMsg     *ReplyMsg     `json:"replyMsg"`     // 回复消息
 	QuoteMsg     *QuoteMsg     `json:"quoteMsg"`     // 引用消息
 	AtMsg        *AtMsg        `json:"atMsg"`        // @用户的消息 群聊才有
+}
+
+// Scan 取出来的时候的数据
+func (c *Msg) Scan(val interface{}) error {
+	return json.Unmarshal(val.([]byte), c)
+}
+
+// Value 入库的数据
+func (c Msg) Value() (driver.Value, error) {
+	b, err := json.Marshal(c)
+	return string(b), err
 }
 
 type ImageMsg struct {
