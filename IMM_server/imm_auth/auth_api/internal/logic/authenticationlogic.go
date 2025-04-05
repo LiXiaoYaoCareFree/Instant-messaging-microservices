@@ -42,7 +42,5 @@ func (l *AuthenticationLogic) Authentication(token string) (resp string, err err
 		return
 	}
 
-	resp = "ok"
-	err = nil
-	return
+	return "ok", nil
 }

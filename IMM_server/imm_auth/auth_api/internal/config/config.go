@@ -16,4 +16,9 @@ type Config struct {
 		Pwd  string
 		DB   int
 	}
+	OpenLoginList []struct {
+		Name string
+		Icon string
+		Href string
+	}
 }
