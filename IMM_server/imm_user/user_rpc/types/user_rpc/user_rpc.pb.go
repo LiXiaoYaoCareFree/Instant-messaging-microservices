@@ -22,14 +22,15 @@ const (
 )
 
 type UserCreateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	NickName      string                 `protobuf:"bytes,1,opt,name=nick_name,json=nickName,proto3" json:"nick_name,omitempty"`
-	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	Role          int32                  `protobuf:"varint,3,opt,name=role,proto3" json:"role,omitempty"`
-	Avatar        string                 `protobuf:"bytes,4,opt,name=avatar,proto3" json:"avatar,omitempty"`
-	OpenId        string                 `protobuf:"bytes,5,opt,name=open_id,json=openId,proto3" json:"open_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	NickName       string                 `protobuf:"bytes,1,opt,name=nick_name,json=nickName,proto3" json:"nick_name,omitempty"`
+	Password       string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	Role           int32                  `protobuf:"varint,3,opt,name=role,proto3" json:"role,omitempty"`
+	Avatar         string                 `protobuf:"bytes,4,opt,name=avatar,proto3" json:"avatar,omitempty"`
+	OpenId         string                 `protobuf:"bytes,5,opt,name=open_id,json=openId,proto3" json:"open_id,omitempty"`
+	RegisterSource string                 `protobuf:"bytes,6,opt,name=register_source,json=registerSource,proto3" json:"register_source,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *UserCreateRequest) Reset() {
@@ -97,6 +98,13 @@ func (x *UserCreateRequest) GetOpenId() string {
 	return ""
 }
 
+func (x *UserCreateRequest) GetRegisterSource() string {
+	if x != nil {
+		return x.RegisterSource
+	}
+	return ""
+}
+
 type UserCreateResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        int32                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -145,13 +153,14 @@ var File_user_rpc_proto protoreflect.FileDescriptor
 
 const file_user_rpc_proto_rawDesc = "" +
 	"\n" +
-	"\x0euser_rpc.proto\x12\buser_rpc\"\x91\x01\n" +
+	"\x0euser_rpc.proto\x12\buser_rpc\"\xba\x01\n" +
 	"\x11UserCreateRequest\x12\x1b\n" +
 	"\tnick_name\x18\x01 \x01(\tR\bnickName\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x12\n" +
 	"\x04role\x18\x03 \x01(\x05R\x04role\x12\x16\n" +
 	"\x06avatar\x18\x04 \x01(\tR\x06avatar\x12\x17\n" +
-	"\aopen_id\x18\x05 \x01(\tR\x06openId\"-\n" +
+	"\aopen_id\x18\x05 \x01(\tR\x06openId\x12'\n" +
+	"\x0fregister_source\x18\x06 \x01(\tR\x0eregisterSource\"-\n" +
 	"\x12UserCreateResponse\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x05R\x06userId2P\n" +
 	"\x05Users\x12G\n" +
