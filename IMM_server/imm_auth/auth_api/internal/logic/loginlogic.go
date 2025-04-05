@@ -1,7 +1,11 @@
 package logic
 
 import (
+	"IMM_server/imm_auth/auth_models"
+	"IMM_server/utils/jwts"
+	"IMM_server/utils/pwd"
 	"context"
+	"errors"
 
 	"IMM_server/imm_auth/auth_api/internal/svc"
 	"IMM_server/imm_auth/auth_api/internal/types"
@@ -17,14 +21,33 @@ type LoginLogic struct {
 
 func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic {
 	return &LoginLogic{
-		Logger: logx.WithContext(ctx),
-		ctx:    ctx,
-		svcCtx: svcCtx,
+		Logger: logx.WithContext(ctx), // 内嵌日志功能
+		ctx:    ctx,                   // 上下文
+		svcCtx: svcCtx,                // go-zero 的 ServiceContext，包含数据库、配置等依赖
 	}
 }
 
 func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, err error) {
-	// todo: add your logic here and delete this line
 
-	return &types.LoginResponse{Token: "xxx"}, nil
+	var user auth_models.UserModel
+	err = l.svcCtx.DB.Take(&user, "id = ?", req.UserName).Error
+	if err != nil {
+		err = errors.New("用户名或密码错误")
+		return
+	}
+	if !pwd.CheckPwd(user.Pwd, req.Password) {
+		err = errors.New("用户名或密码错误")
+		return
+	}
+	token, err := jwts.GenToken(jwts.JwtPayLoad{
+		UserID:   user.ID,
+		Nickname: user.Nickname,
+		Role:     user.Role,
+	}, l.svcCtx.Config.Auth.AccessSecret, l.svcCtx.Config.Auth.AccessExpire)
+	if err != nil {
+		logx.Error(err)
+		err = errors.New("服务内部错误")
+		return
+	}
+	return &types.LoginResponse{Token: token}, nil
 }

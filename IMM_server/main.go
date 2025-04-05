@@ -20,7 +20,7 @@ func main() {
 	flag.Parse()
 
 	if opt.DB {
-		db := core.InitGorm("")
+		db := core.InitGorm("root:root@tcp(127.0.0.1:3306)/imm_server_db?charset=utf8mb4&parseTime=True&loc=Local")
 		err := db.AutoMigrate(
 			&user_models.UserModel{},         // 用户表
 			&user_models.FriendModel{},       // 好友表
