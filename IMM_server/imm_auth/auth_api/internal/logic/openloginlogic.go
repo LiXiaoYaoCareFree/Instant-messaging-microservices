@@ -4,6 +4,8 @@ import (
 	"IMM_server/imm_auth/auth_api/internal/svc"
 	"IMM_server/imm_auth/auth_api/internal/types"
 	"IMM_server/imm_auth/auth_models"
+	"IMM_server/imm_user/user_rpc/types/user_rpc"
+	"IMM_server/utils/jwts"
 	"IMM_server/utils/open_login"
 	"context"
 	"errors"
@@ -46,11 +48,34 @@ func (l *Open_loginLogic) Open_login(req *types.OpenLoginRequest) (resp *types.L
 		if err != nil {
 			// 注册逻辑
 			fmt.Println("注册服务")
+			res, err := l.svcCtx.UserRpc.UserCreate(context.Background(), &user_rpc.UserCreateRequest{
+				NickName: info.Nickname,
+				Password: "",
+				Role:     2,
+				Avatar:   info.Avatar,
+				OpenId:   info.OpenID,
+			})
+			if err != nil {
+				logx.Error(err)
+				return nil, errors.New("登录失败")
+			}
+			user.Model.ID = uint(res.UserId)
+			user.Role = 2
+			user.Nickname = info.Nickname
 		}
 
 		// 登录逻辑
-		//jwts.GenToken()
-
+		token, err1 := jwts.GenToken(jwts.JwtPayLoad{
+			UserID:   user.ID,
+			Nickname: user.Nickname,
+			Role:     user.Role,
+		}, l.svcCtx.Config.Auth.AccessSecret, l.svcCtx.Config.Auth.AccessExpire)
+		if err1 != nil {
+			logx.Error(err1)
+			err = errors.New("服务内部错误")
+			return nil, err1
+		}
+		return &types.LoginResponse{Token: token}, nil
 	}
 
 	return

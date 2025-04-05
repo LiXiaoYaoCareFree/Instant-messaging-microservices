@@ -24,3 +24,8 @@ OpenLoginList:
   - name: QQ登录
     icon: https://www.fengfengzhidao.com/image/icon/qq.png
     href:
+UserRpc:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: userrpc.rpc
