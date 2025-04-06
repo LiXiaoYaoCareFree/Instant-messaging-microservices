@@ -9,7 +9,7 @@ func TestGenToken(t *testing.T) {
 	token, err := GenToken(JwtPayLoad{
 		UserID:   1,
 		Role:     1,
-		Username: "lly",
+		Nickname: "lly",
 	}, "12345", 8)
 	fmt.Println(token, err)
 }
