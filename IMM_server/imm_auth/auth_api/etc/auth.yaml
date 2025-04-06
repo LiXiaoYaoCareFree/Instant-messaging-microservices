@@ -16,6 +16,7 @@ Redis:
   Addr: 127.0.0.1:6379
   Pwd:
   DB: 0
+Etcd: 127.0.0.1:2379
 QQ:
   AppID: ""
   AppKey: ""
