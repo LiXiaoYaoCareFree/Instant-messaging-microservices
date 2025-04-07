@@ -15,35 +15,27 @@ import (
 	"strings"
 )
 
-func gateway(res http.ResponseWriter, req *http.Request) {
-	// 匹配请求前缀  /api/user/xx
-	regex, _ := regexp.Compile(`/api/(.*?)/`)
-	addrList := regex.FindStringSubmatch(req.URL.Path)
-	if len(addrList) != 2 {
-		res.Write([]byte("err"))
-		return
-	}
-	service := addrList[1]
+type BaseResponse struct {
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+	Data any    `json:"data"`
+}
 
-	addr := etcd.GetServiceAddr(config.Etcd, service+"_api")
-	if addr == "" {
-		fmt.Println("不匹配的服务", service)
-		res.Write([]byte("err"))
-		return
-	}
+func FilResponse(msg string, res http.ResponseWriter) {
+	response := BaseResponse{Code: 7, Msg: msg}
+	byteData, _ := json.Marshal(response)
+	res.Write(byteData)
+}
 
-	remoteAddr := strings.Split(req.RemoteAddr, ":")
-	fmt.Println(remoteAddr)
+func auth(authAddr string, res http.ResponseWriter, req *http.Request) (ok bool) {
+	authReq, _ := http.NewRequest("POST", authAddr, nil)
 
-	// 请求认证服务地址
-	authAddr := etcd.GetServiceAddr(config.Etcd, "auth_api")
-	authUrl := fmt.Sprintf("http://%s/api/auth/authentication", authAddr)
-	authReq, _ := http.NewRequest("POST", authUrl, nil)
 	authReq.Header = req.Header
 	authReq.Header.Set("ValidPath", req.URL.Path)
 	authRes, err := http.DefaultClient.Do(authReq)
 	if err != nil {
-		res.Write([]byte("认证服务错误"))
+		logx.Error(err)
+		FilResponse("认证服务错误", res)
 		return
 	}
 
@@ -56,7 +48,7 @@ func gateway(res http.ResponseWriter, req *http.Request) {
 	authErr := json.Unmarshal(byteData, &authResponse)
 	if authErr != nil {
 		logx.Error(authErr)
-		res.Write([]byte("认证服务错误"))
+		FilResponse("认证服务错误", res)
 		return
 	}
 
@@ -65,15 +57,16 @@ func gateway(res http.ResponseWriter, req *http.Request) {
 		res.Write(byteData)
 		return
 	}
+	return true
+}
 
-	url := fmt.Sprintf("http://%s%s", addr, req.URL.String())
-	fmt.Println(url)
+func proxy(proxyAddr string, res http.ResponseWriter, req *http.Request) {
+	byteData, _ := io.ReadAll(req.Body)
+	proxyReq, err := http.NewRequest(req.Method, proxyAddr, bytes.NewBuffer(byteData))
 
-	byteData, _ = io.ReadAll(req.Body)
-	proxyReq, err := http.NewRequest(req.Method, url, bytes.NewBuffer(byteData))
 	if err != nil {
 		logx.Error(err)
-		res.Write([]byte("err"))
+		FilResponse("err", res)
 		return
 	}
 
@@ -81,11 +74,44 @@ func gateway(res http.ResponseWriter, req *http.Request) {
 	proxyReq.Header.Del("ValidPath")
 	response, ProxyErr := http.DefaultClient.Do(proxyReq)
 	if ProxyErr != nil {
-		fmt.Println(ProxyErr)
-		res.Write([]byte("服务异常"))
+		logx.Error(ProxyErr)
+		FilResponse("服务异常", res)
 		return
 	}
 	io.Copy(res, response.Body)
+}
+
+func gateway(res http.ResponseWriter, req *http.Request) {
+	// 匹配请求前缀  /api/user/xx
+	regex, _ := regexp.Compile(`/api/(.*?)/`)
+	addrList := regex.FindStringSubmatch(req.URL.Path)
+	if len(addrList) != 2 {
+		res.Write([]byte("err"))
+		return
+	}
+	service := addrList[1]
+
+	addr := etcd.GetServiceAddr(config.Etcd, service+"_api")
+	if addr == "" {
+		logx.Errorf("%s 不匹配的服务", service)
+		FilResponse("err", res)
+		return
+	}
+
+	remoteAddr := strings.Split(req.RemoteAddr, ":")
+	// 请求认证服务地址
+	authAddr := etcd.GetServiceAddr(config.Etcd, "auth_api")
+	authUrl := fmt.Sprintf("http://%s/api/auth/authentication", authAddr)
+	proxyUrl := fmt.Sprintf("http://%s%s", addr, req.URL.String())
+
+	// 打印日志
+	logx.Infof("%s %s", remoteAddr[0], proxyUrl)
+
+	if !auth(authUrl, res, req) {
+		return
+	}
+
+	proxy(proxyUrl, res, req)
 }
 
 var configFile = flag.String("f", "settings.yaml", "the config file")
@@ -93,6 +119,7 @@ var configFile = flag.String("f", "settings.yaml", "the config file")
 type Config struct {
 	Addr string
 	Etcd string
+	Log  logx.LogConf
 }
 
 var config Config
@@ -100,6 +127,8 @@ var config Config
 func main() {
 	flag.Parse()
 	conf.MustLoad(*configFile, &config)
+
+	logx.SetUp(config.Log)
 
 	// 回调函数
 	http.HandleFunc("/", gateway)
