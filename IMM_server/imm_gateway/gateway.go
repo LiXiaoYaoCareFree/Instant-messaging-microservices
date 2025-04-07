@@ -2,7 +2,9 @@ package main
 
 import (
 	"IMM_server/common/etcd"
+	"bytes"
 	"encoding/json"
+
 	"flag"
 	"fmt"
 	"github.com/zeromicro/go-zero/core/conf"
@@ -67,14 +69,16 @@ func gateway(res http.ResponseWriter, req *http.Request) {
 	url := fmt.Sprintf("http://%s%s", addr, req.URL.String())
 	fmt.Println(url)
 
-	proxyReq, err := http.NewRequest(req.Method, url, req.Body)
+	byteData, _ = io.ReadAll(req.Body)
+	proxyReq, err := http.NewRequest(req.Method, url, bytes.NewBuffer(byteData))
 	if err != nil {
 		logx.Error(err)
 		res.Write([]byte("err"))
 		return
 	}
-	fmt.Println(proxyReq)
-	proxyReq.Header.Set("X-Forwarded-For", remoteAddr[0])
+
+	proxyReq.Header = req.Header
+	proxyReq.Header.Del("ValidPath")
 	response, ProxyErr := http.DefaultClient.Do(proxyReq)
 	if ProxyErr != nil {
 		fmt.Println(ProxyErr)

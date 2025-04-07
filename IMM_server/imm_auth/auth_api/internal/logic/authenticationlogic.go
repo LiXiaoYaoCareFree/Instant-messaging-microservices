@@ -35,18 +35,21 @@ func (l *AuthenticationLogic) Authentication(req *types.AuthenticationRequest) (
 	}
 
 	if req.Token == "" {
+		logx.Error("token为空")
 		err = errors.New("认证失败")
 		return
 	}
 
-	payload, err := jwts.ParseToken(req.Token, l.svcCtx.Config.Auth.AccessSecret)
+	_, err = jwts.ParseToken(req.Token, l.svcCtx.Config.Auth.AccessSecret)
 	if err != nil {
+		logx.Error(err.Error())
 		err = errors.New("认证失败")
 		return
 	}
 
-	_, err = l.svcCtx.Redis.Get(fmt.Sprintf("logout_%d", payload.UserID)).Result()
+	_, err = l.svcCtx.Redis.Get(fmt.Sprintf("logout_%s", req.Token)).Result()
 	if err == nil {
+		logx.Error("在黑名单中")
 		err = errors.New("认证失败")
 		return
 	}

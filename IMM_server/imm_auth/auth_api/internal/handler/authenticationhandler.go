@@ -5,7 +5,6 @@ import (
 	"IMM_server/imm_auth/auth_api/internal/logic"
 	"IMM_server/imm_auth/auth_api/internal/svc"
 	"IMM_server/imm_auth/auth_api/internal/types"
-	"fmt"
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -18,7 +17,6 @@ func authenticationHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			response.Response(r, w, nil, err)
 			return
 		}
-		fmt.Println(r.Header)
 		l := logic.NewAuthenticationLogic(r.Context(), svcCtx)
 		resp, err := l.Authentication(&req)
 

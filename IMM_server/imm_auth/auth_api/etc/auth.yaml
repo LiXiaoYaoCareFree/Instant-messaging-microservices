@@ -33,3 +33,5 @@ UserRpc:
 WhiteList:
   - /api/auth/login
   - /api/auth/open_login
+  - /api/auth/authentication
+  - /api/auth/logout

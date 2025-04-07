@@ -40,7 +40,7 @@ func (l *LogoutLogic) Logout(token string) (resp string, err error) {
 	// 过期时间就是这个jwt的失效时间
 	expiration := payload.ExpiresAt.Time.Sub(now)
 
-	key := fmt.Sprintf("logout_%d", payload.UserID)
+	key := fmt.Sprintf("logout_%s", token)
 	l.svcCtx.Redis.Set(key, token, expiration)
 	resp = "注销成功"
 	return
