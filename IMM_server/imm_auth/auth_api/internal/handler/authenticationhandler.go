@@ -4,14 +4,25 @@ import (
 	"IMM_server/common/response"
 	"IMM_server/imm_auth/auth_api/internal/logic"
 	"IMM_server/imm_auth/auth_api/internal/svc"
+	"IMM_server/imm_auth/auth_api/internal/types"
+	"fmt"
 	"net/http"
+
+	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 func authenticationHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		l := logic.NewAuthenticationLogic(r.Context(), svcCtx) // 接收客户端请求
-		token := r.Header.Get("token")                         // 从请求头中获取 token
-		resp, err := l.Authentication(token)                   // 调用逻辑层的 Authentication() 方法处理认证
-		response.Response(r, w, resp, err)                     // 返回结果给客户端
+		var req types.AuthenticationRequest
+		if err := httpx.Parse(r, &req); err != nil {
+			response.Response(r, w, nil, err)
+			return
+		}
+		fmt.Println(r.Header)
+		l := logic.NewAuthenticationLogic(r.Context(), svcCtx)
+		resp, err := l.Authentication(&req)
+
+		response.Response(r, w, resp, err)
+
 	}
 }

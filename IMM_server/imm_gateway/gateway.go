@@ -36,8 +36,9 @@ func gateway(res http.ResponseWriter, req *http.Request) {
 	// 请求认证服务地址
 	authAddr := etcd.GetServiceAddr(config.Etcd, "auth_api")
 	authUrl := fmt.Sprintf("http://%s/api/auth/authentication", authAddr)
-	authReq, _ := http.NewRequest("POST", authUrl, req.Body)
-	authReq.Header.Set("X-Forwarded-For", remoteAddr[0])
+	authReq, _ := http.NewRequest("POST", authUrl, nil)
+	authReq.Header = req.Header
+	authReq.Header.Set("ValidPath", req.URL.Path)
 	authRes, err := http.DefaultClient.Do(authReq)
 	if err != nil {
 		res.Write([]byte("认证服务错误"))
@@ -65,6 +66,7 @@ func gateway(res http.ResponseWriter, req *http.Request) {
 
 	url := fmt.Sprintf("http://%s%s", addr, req.URL.String())
 	fmt.Println(url)
+
 	proxyReq, err := http.NewRequest(req.Method, url, req.Body)
 	if err != nil {
 		logx.Error(err)
@@ -73,9 +75,9 @@ func gateway(res http.ResponseWriter, req *http.Request) {
 	}
 	fmt.Println(proxyReq)
 	proxyReq.Header.Set("X-Forwarded-For", remoteAddr[0])
-	response, err := http.DefaultClient.Do(proxyReq)
-	if err != nil {
-		fmt.Println(err)
+	response, ProxyErr := http.DefaultClient.Do(proxyReq)
+	if ProxyErr != nil {
+		fmt.Println(ProxyErr)
 		res.Write([]byte("服务异常"))
 		return
 	}
