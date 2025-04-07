@@ -3,7 +3,7 @@
 
 # 📡 IMM Server - 即时通信服务
 
-**IMM (Instant Messaging Microservices)** 是一个基于微服务架构构建的即时通信系统，具备市面主流 IM 应用的大部分功能，涵盖了中大型项目开发流程、系统设计与微服务架构整合。
+**IMM (Instant Messaging Microservices)** 是一个基于微服务架构构建的即时通信系统，具备市面主流 IM 应用的大部分功能，涵盖了中大型项目开发流程、系统设计与微服务架构。
 
 ---
 
