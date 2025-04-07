@@ -3,6 +3,11 @@
 
 package types
 
+type AuthenticationReponse struct {
+	UserID uint `json:"userID"`
+	Role   int  `json:"role"`
+}
+
 type AuthenticationRequest struct {
 	Token     string `header:"Token,optional"`
 	ValidPath string `header:"ValidPath,optional"`

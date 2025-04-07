@@ -7,6 +7,7 @@ import (
 	"IMM_server/utils/jwts"
 	"context"
 	"errors"
+
 	"fmt"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -26,12 +27,11 @@ func NewAuthenticationLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Au
 	}
 }
 
-func (l *AuthenticationLogic) Authentication(req *types.AuthenticationRequest) (resp string, err error) {
+func (l *AuthenticationLogic) Authentication(req *types.AuthenticationRequest) (resp *types.AuthenticationReponse, err error) {
 
-	fmt.Println(req.Token, req.ValidPath)
 	if utils.InList(l.svcCtx.Config.WhiteList, req.ValidPath) {
 		logx.Infof("%s 在白名单中", req.ValidPath)
-		return "ok", nil
+		return
 	}
 
 	if req.Token == "" {
@@ -40,7 +40,7 @@ func (l *AuthenticationLogic) Authentication(req *types.AuthenticationRequest) (
 		return
 	}
 
-	_, err = jwts.ParseToken(req.Token, l.svcCtx.Config.Auth.AccessSecret)
+	claims, err := jwts.ParseToken(req.Token, l.svcCtx.Config.Auth.AccessSecret)
 	if err != nil {
 		logx.Error(err.Error())
 		err = errors.New("认证失败")
@@ -53,5 +53,8 @@ func (l *AuthenticationLogic) Authentication(req *types.AuthenticationRequest) (
 		err = errors.New("认证失败")
 		return
 	}
-	return "ok", nil
+	return &types.AuthenticationReponse{
+		UserID: claims.UserID,
+		Role:   int(claims.Role),
+	}, nil
 }
