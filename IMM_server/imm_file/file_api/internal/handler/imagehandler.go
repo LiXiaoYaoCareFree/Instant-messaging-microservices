@@ -69,7 +69,7 @@ func ImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		filePath := path.Join(svcCtx.Config.UploadDir, imageType, fileHead.Filename)
 		imageData, _ := io.ReadAll(file)
 
-		//fileName := fileHead.Filename
+		fileName := fileHead.Filename
 
 		l := logic.NewImageLogic(r.Context(), svcCtx)
 		resp, err := l.Image(&req)
@@ -90,14 +90,17 @@ func ImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 
 			// 两个文件是不一样的
 			// 改名的操作
-
+			var prefix = utils.GetFilePrefix(fileName)
+			newPath := fmt.Sprintf("%s_%s.%s", prefix, random.RandStr(4), suffix)
+			filePath = path.Join(svcCtx.Config.UploadDir, imageType, newPath)
+			// 我改了的名字，还是重名了  这个地方就得递归判断了
 		}
 		err = os.WriteFile(filePath, imageData, 0666)
 		if err != nil {
 			response.Response(r, w, nil, err)
 			return
 		}
-
+		resp.Url = "/" + filePath
 		response.Response(r, w, resp, err)
 
 	}

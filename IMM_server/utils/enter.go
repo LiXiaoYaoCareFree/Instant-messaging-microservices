@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"github.com/zeromicro/go-zero/core/logx"
 	"regexp"
+	"strings"
 )
 
 func InList(list []string, key string) (ok bool) {
@@ -34,4 +35,16 @@ func MD5(data []byte) string {
 	h.Write(data)
 	cipherStr := h.Sum(nil)
 	return hex.EncodeToString(cipherStr)
+}
+func GetFilePrefix(fileName string) (prefix string) {
+	nameList := strings.Split(fileName, ".")
+	for i := 0; i < len(nameList)-1; i++ {
+		if i == len(nameList)-2 {
+			prefix += nameList[i]
+			continue
+		} else {
+			prefix += nameList[i] + "."
+		}
+	}
+	return
 }

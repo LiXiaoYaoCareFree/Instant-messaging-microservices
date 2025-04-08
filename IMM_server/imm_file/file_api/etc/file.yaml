@@ -8,7 +8,7 @@ Log:
   Stat: false
 
 FileSize: 10 # 单位是MB
-WhileList:
+WhiteList:
   - png
   - jpg
   - jpeg
