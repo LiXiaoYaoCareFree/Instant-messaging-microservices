@@ -3,8 +3,8 @@ package logic
 import (
 	"context"
 
-	"IMM_server/imm_auth/auth_api/internal/svc"
-	"IMM_server/imm_auth/auth_api/internal/types"
+	"IMM_server/imm_settings/settings_api/internal/svc"
+	"IMM_server/imm_settings/settings_api/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
