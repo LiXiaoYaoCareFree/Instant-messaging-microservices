@@ -3,6 +3,20 @@
 
 package types
 
+type FriendInfoRequest struct {
+	UserID   uint `header:"User-ID"`
+	Role     int8 `header:"Role"`
+	FriendID uint `form:"friendID"` // 好友的用户id
+}
+
+type FriendInfoResponse struct {
+	UserID   uint   `json:"userID"`
+	Nickname string `json:"nickname"`
+	Abstract string `json:"abstract"`
+	Avatar   string `json:"avatar"`
+	Notice   string `json:"notice"`
+}
+
 type UserInfoRequest struct {
 	UserID uint `header:"User-ID"`
 	Role   int8 `header:"Role"`

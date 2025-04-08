@@ -46,11 +46,28 @@ type UserInfoUpdateRequest {
 
 type UserInfoUpdateResponse {}
 
+type FriendInfoRequest {
+	UserID   uint `header:"User-ID"`
+	Role     int8 `header:"Role"`
+	FriendID uint `form:"friendID"` // 好友的用户id
+}
+
+type FriendInfoResponse {
+	UserID   uint   `json:"userID"`
+	Nickname string `json:"nickname"`
+	Abstract string `json:"abstract"`
+	Avatar   string `json:"avatar"`
+	Notice   string `json:"notice"`
+}
+
 service users {
 	@handler UserInfo
 	get /api/user/user_info (UserInfoRequest) returns (UserInfoResponse) // 用户信息接口
 
 	@handler UserInfoUpdate
 	put /api/user/user_info (UserInfoUpdateRequest) returns (UserInfoUpdateResponse) // 用户信息修改接口
+
+	@handler friendInfo
+	get /api/user/friend_info (FriendInfoRequest) returns (FriendInfoResponse) // 好友信息接口
 } // goctl api go -api user_api.api -dir . --home ../../template
 

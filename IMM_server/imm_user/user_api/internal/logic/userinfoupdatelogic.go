@@ -9,8 +9,6 @@ import (
 	"context"
 	"errors"
 
-	"fmt"
-
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -59,7 +57,6 @@ func (l *UserInfoUpdateLogic) UserInfoUpdate(req *types.UserInfoUpdateRequest) (
 
 			data := ctype.VerificationQuestion{}
 			maps.MapToStruct(verificationQuestion.(map[string]any), &data)
-			fmt.Println(data)
 
 			l.svcCtx.DB.Model(&userConf).Updates(&user_models.UserConfModel{
 				VerificationQuestion: &data,
