@@ -6,6 +6,7 @@ import (
 	"IMM_server/imm_file/file_api/internal/svc"
 	"IMM_server/imm_file/file_api/internal/types"
 	"IMM_server/utils"
+	"IMM_server/utils/random"
 	"errors"
 
 	"fmt"
@@ -26,8 +27,10 @@ func ImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 		imageType := r.FormValue("imageType")
-		if imageType == "" {
-			response.Response(r, w, nil, errors.New("imageType不能为空"))
+		switch imageType {
+		case "avatar", "group_avatar", "chat":
+		default:
+			response.Response(r, w, nil, errors.New("imageType只能为 avatar,group_avatar,chat"))
 			return
 		}
 		file, fileHead, err := r.FormFile("image")
@@ -74,7 +77,7 @@ func ImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		l := logic.NewImageLogic(r.Context(), svcCtx)
 		resp, err := l.Image(&req)
 		resp.Url = "/" + filePath
-		if InDir(dir, fileHead.Filename) {
+		if utils.InDir(dir, fileHead.Filename) {
 			// 重名了
 
 			// 先读之前的文件，去算一下它的hash
@@ -104,13 +107,4 @@ func ImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		response.Response(r, w, resp, err)
 
 	}
-}
-
-func InDir(dir []os.DirEntry, file string) bool {
-	for _, entry := range dir {
-		if entry.Name() == file {
-			return true
-		}
-	}
-	return false
 }
