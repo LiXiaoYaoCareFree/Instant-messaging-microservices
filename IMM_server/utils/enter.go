@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"github.com/zeromicro/go-zero/core/logx"
 	"regexp"
 )
@@ -26,4 +28,10 @@ func InListByRegex(list []string, key string) (ok bool) {
 		}
 	}
 	return false
+}
+func MD5(data []byte) string {
+	h := md5.New()
+	h.Write(data)
+	cipherStr := h.Sum(nil)
+	return hex.EncodeToString(cipherStr)
 }

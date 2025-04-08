@@ -15,3 +15,4 @@ WhileList:
   - gif
   - webp
 MaxBytes: 5368709120
+UploadDir: uploads
