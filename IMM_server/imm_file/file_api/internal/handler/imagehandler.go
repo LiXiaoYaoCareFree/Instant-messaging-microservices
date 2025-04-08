@@ -5,8 +5,10 @@ import (
 	"IMM_server/imm_file/file_api/internal/logic"
 	"IMM_server/imm_file/file_api/internal/svc"
 	"IMM_server/imm_file/file_api/internal/types"
+	"IMM_server/utils"
 	"errors"
 	"fmt"
+	"strings"
 
 	"io"
 	"net/http"
@@ -39,6 +41,16 @@ func ImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		// 文件后缀白名单
+		nameList := strings.Split(fileHead.Filename, ".")
+		var suffix string
+		if len(nameList) > 1 {
+			suffix = nameList[len(nameList)-1]
+		}
+
+		if !utils.InList(svcCtx.Config.WhiteList, suffix) {
+			response.Response(r, w, nil, errors.New("图片非法"))
+			return
+		}
 
 		// 文件重名
 
