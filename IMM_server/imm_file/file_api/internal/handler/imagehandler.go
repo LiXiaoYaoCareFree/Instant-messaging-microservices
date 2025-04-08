@@ -6,6 +6,7 @@ import (
 	"IMM_server/imm_file/file_api/internal/svc"
 	"IMM_server/imm_file/file_api/internal/types"
 	"errors"
+	"fmt"
 
 	"io"
 	"net/http"
@@ -28,6 +29,19 @@ func ImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			response.Response(r, w, nil, err)
 			return
 		}
+
+		// 文件大小限制
+		mSize := float64(fileHead.Size) / float64(1024) / float64(1024)
+
+		if mSize > svcCtx.Config.FileSize {
+			response.Response(r, w, nil, fmt.Errorf("图片大小超过限制，最大只能上传%.2fMB大小的图片", svcCtx.Config.FileSize))
+			return
+		}
+
+		// 文件后缀白名单
+
+		// 文件重名
+
 		imageType := r.FormValue("imageType")
 		if imageType == "" {
 			response.Response(r, w, nil, errors.New("imageType不能为空"))

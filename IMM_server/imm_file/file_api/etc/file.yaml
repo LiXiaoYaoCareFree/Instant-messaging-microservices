@@ -6,3 +6,11 @@ Log:
   Encoding: plain
   TimeFormat: 2006-01-02 15:04:05
   Stat: false
+
+FileSize: 1 # 单位是MB
+WhileList:
+  - png
+  - jpg
+  - jpeg
+  - gif
+  - webp
