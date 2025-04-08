@@ -39,14 +39,16 @@ func (l *FriendInfoLogic) FriendInfo(req *types.FriendInfoRequest) (resp *types.
 		return nil, errors.New(err.Error())
 	}
 
-	var user user_models.UserModel
-	json.Unmarshal(res.Data, &user)
+	var friendUser user_models.UserModel
+	json.Unmarshal(res.Data, &friendUser)
 
-	return &types.FriendInfoResponse{
-		UserID:   user.ID,
-		Nickname: user.Nickname,
-		Abstract: user.Abstract,
-		Avatar:   user.Avatar,
-		Notice:   friend.Notice,
-	}, nil
+	response := types.FriendInfoResponse{
+		UserID:   friendUser.ID,
+		Nickname: friendUser.Nickname,
+		Abstract: friendUser.Abstract,
+		Avatar:   friendUser.Avatar,
+		Notice:   friend.GetUserNotice(req.UserID),
+	}
+
+	return &response, nil
 }
