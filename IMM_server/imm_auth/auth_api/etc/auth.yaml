@@ -35,4 +35,4 @@ WhiteList:
   - /api/auth/open_login
   - /api/auth/authentication
   - /api/auth/logout
-  - /api/file/uploads/avatar
+  - /api/file/uploads/.*?/.*?
