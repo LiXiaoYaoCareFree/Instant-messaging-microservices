@@ -28,7 +28,17 @@ func (l *FriendListLogic) FriendList(req *types.FriendListRequest) (resp *types.
 	var count int64
 	l.svcCtx.DB.Model(user_models.FriendModel{}).Where("send_user_id = ? or rev_user_id = ?", req.UserID, req.UserID).Count(&count)
 	var friends []user_models.FriendModel
-	l.svcCtx.DB.Preload("SendUserModel").Preload("RevUserModel").Find(&friends, "send_user_id = ? or rev_user_id = ?", req.UserID, req.UserID)
+
+	if req.Limit <= 0 {
+		req.Limit = 10
+	}
+	if req.Page <= 0 {
+		req.Page = 1
+	}
+
+	offset := (req.Page - 1) * req.Limit
+
+	l.svcCtx.DB.Preload("SendUserModel").Preload("RevUserModel").Limit(req.Limit).Offset(offset).Find(&friends, "send_user_id = ? or rev_user_id = ?", req.UserID, req.UserID)
 	var list []types.FriendInfoResponse
 	for _, friend := range friends {
 
@@ -40,7 +50,7 @@ func (l *FriendListLogic) FriendList(req *types.FriendListRequest) (resp *types.
 				Nickname: friend.RevUserModel.Nickname,
 				Abstract: friend.RevUserModel.Abstract,
 				Avatar:   friend.RevUserModel.Avatar,
-				Notice:   friend.RevUserNotice,
+				Notice:   friend.SenUserNotice,
 			}
 		}
 		if friend.RevUserID == req.UserID {
@@ -50,7 +60,7 @@ func (l *FriendListLogic) FriendList(req *types.FriendListRequest) (resp *types.
 				Nickname: friend.SendUserModel.Nickname,
 				Abstract: friend.SendUserModel.Abstract,
 				Avatar:   friend.SendUserModel.Avatar,
-				Notice:   friend.SenUserNotice,
+				Notice:   friend.RevUserNotice,
 			}
 		}
 		list = append(list, info)
